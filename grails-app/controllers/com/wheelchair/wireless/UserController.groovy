@@ -52,14 +52,17 @@ class UserController {
         def json = [status : 1, message : ""]
         def getUsr = Users.findByUserNameAndPassword(params.loguserName, params.logpassword)
         println "getUsr"+ getUsr
-//        def userPreferences = []
         if(getUsr){
-//            if(getUsr.userPref>0){
-//                println getUsr.userPref.getClass().getName() 
-//                userPreferences = String(getUsr.userPref)
-//            }
-            json = [status : 1, message : "Login Successful",userPrefs:getUsr.userPref, loginUser:params.loguserName]
-            render json as JSON
+            def blb = getUsr.userPref
+            if(blb){
+                byte[] bdata = blb.getBytes(1, (int)blb.length()); 
+                String userPrefs = new String(bdata);
+                json = [status : 1, message : "Login Successful",userPrefs:userPrefs, loginUser:params.loguserName]
+                render json as JSON
+            }else{
+                json = [status : 1, message : "Login Successful", loginUser:params.loguserName]
+                render json as JSON
+            }
         }else{
             json = [status : 0, message : "Wrong Credentials"]
             render json as JSON
@@ -68,14 +71,34 @@ class UserController {
     
     def logout(){
         println params
-        print params.arr
         def getUsr = Users.findByUserName(params.userName)
-        print "getUsr"+getUsr
-        getUsr.userPref = params.arr
+        java.sql.Blob blob = org.hibernate.Hibernate.createBlob(params.userPrefs.getBytes());
+        getUsr.userPref = blob
         getUsr.save()
         session.invalidate()
         def json = [status : 1, message : "Logout Successfully"]
-            render json as JSON
+        render json as JSON
     }
+    
+    def saveStatus(){
+        def json = [status : 1, message : "Prefs Saved"]
+        println params
+        def getUsr = Users.findByUserName(params.userName)
+        java.sql.Blob blob = org.hibernate.Hibernate.createBlob(params.userPrefs.getBytes());
+        getUsr.userPref = blob
+        getUsr.save()
+        render json as JSON
+    }
+    
+    def populateStatus(){
+        println params
+        def getUsr = Users.findByUserName(params.loguserName)
 
+        def blb = getUsr.userPref
+        byte[] bdata = blb.getBytes(1, (int)blb.length()); 
+        String userPrefs = new String(bdata);
+        def json = [status : 1, message : "Retrieving Prefs",userPrefs:userPrefs]
+        render json as JSON
+
+    }
 }

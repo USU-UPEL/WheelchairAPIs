@@ -1,12 +1,14 @@
 package WheelChairUsers
 
+import java.sql.Blob
+
 class Users {
     String userName
     String password
     Date createdOn
     String apiAccessToken
     String userLogs
-    String userPref
+    Blob userPref
     static constraints = {
         apiAccessToken nullable: true, maxSize: 255, unique: true
         userName(nullable: true)
