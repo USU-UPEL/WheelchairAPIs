@@ -8,11 +8,13 @@ class UserController {
     static allowedMethods =[signUp:"POST",signIn:"POST"]
     def dataSource
     def index() {
+        header 'Access-Control-Allow-Origin', '*'
         def json = [status : 1, message : "Working Access"]
         render json as JSON
     }
 
     def signUp(){
+        header 'Access-Control-Allow-Origin', '*'
         def json = [status : 1, message : ""]
         def db = new Sql(dataSource)
         try{
@@ -21,6 +23,7 @@ class UserController {
             if(!chkUsrExist){
                 def userObj = new Users()
                 userObj.userName = params.userName
+                userObj.userPref = ''
                 userObj.password = params.password.digest('SHA-256')
                 userObj.createdOn = new Date()
                 def apiAccessToken = UUID.randomUUID().toString()+new Date().getTime()
@@ -48,6 +51,7 @@ class UserController {
     }
 
     def signIn(){
+        header 'Access-Control-Allow-Origin', '*'
         println params
         def json = [status : 1, message : ""]
         def getUsr = Users.findByUserNameAndPassword(params.userName, params.password.digest('SHA-256'))
@@ -69,6 +73,7 @@ class UserController {
     }
 
     def logout(){
+        header 'Access-Control-Allow-Origin', '*'
         println params
         def getUsr = Users.findByUserName(params.userName)
         java.sql.Blob blob = org.hibernate.Hibernate.createBlob(params.userPrefs.getBytes());
@@ -80,6 +85,7 @@ class UserController {
     }
 
     def saveStatus(){
+        header 'Access-Control-Allow-Origin', '*'
         def json = [status : 1, message : "Prefs Saved"]
         println params
         def getUsr = Users.findByUserName(params.userName)
@@ -90,6 +96,7 @@ class UserController {
     }
 
     def populateStatus(){
+        header 'Access-Control-Allow-Origin', '*'
         println params
         def getUsr = Users.findByUserName(params.userName)
 
