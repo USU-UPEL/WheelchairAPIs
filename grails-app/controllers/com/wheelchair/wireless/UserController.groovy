@@ -7,7 +7,7 @@ import groovy.sql.Sql
 class UserController {
     static allowedMethods =[signUp:"POST",signIn:"POST"]
     def dataSource
-    def index() { 
+    def index() {
         def json = [status : 1, message : "Working Access"]
         render json as JSON
     }
@@ -21,7 +21,7 @@ class UserController {
             if(!chkUsrExist){
                 def userObj = new Users()
                 userObj.userName = params.userName
-                userObj.password = params.password
+                userObj.password = params.password.digest('SHA-256')
                 userObj.createdOn = new Date()
                 def apiAccessToken = UUID.randomUUID().toString()+new Date().getTime()
                 def tokenAfterOpr = apiAccessToken.split("-").join()
@@ -32,12 +32,12 @@ class UserController {
                     render json as JSON
                 }else{
                     valUser.errors.allErrors.each{
-                        println it 
+                        println it
                     }
                 }
             }
             else{
-                json = [status : 0, message : "User already Exist"]
+                json = [status : 0, message : "User already exists"]
                 render json as JSON
             }
         }catch(Exception ex){
@@ -50,17 +50,16 @@ class UserController {
     def signIn(){
         println params
         def json = [status : 1, message : ""]
-        def getUsr = Users.findByUserNameAndPassword(params.loguserName, params.logpassword)
-        println "getUsr"+ getUsr
+        def getUsr = Users.findByUserNameAndPassword(params.userName, params.password.digest('SHA-256'))
         if(getUsr){
             def blb = getUsr.userPref
             if(blb){
-                byte[] bdata = blb.getBytes(1, (int)blb.length()); 
+                byte[] bdata = blb.getBytes(1, (int)blb.length());
                 String userPrefs = new String(bdata);
-                json = [status : 1, message : "Login Successful",userPrefs:userPrefs, loginUser:params.loguserName]
+                json = [status : 1, message : "Login Successful",userPrefs:userPrefs, loginUser:params.userName]
                 render json as JSON
             }else{
-                json = [status : 1, message : "Login Successful", loginUser:params.loguserName]
+                json = [status : 1, message : "Login Successful", loginUser:params.userName]
                 render json as JSON
             }
         }else{
@@ -68,7 +67,7 @@ class UserController {
             render json as JSON
         }
     }
-    
+
     def logout(){
         println params
         def getUsr = Users.findByUserName(params.userName)
@@ -79,7 +78,7 @@ class UserController {
         def json = [status : 1, message : "Logout Successfully"]
         render json as JSON
     }
-    
+
     def saveStatus(){
         def json = [status : 1, message : "Prefs Saved"]
         println params
@@ -89,13 +88,13 @@ class UserController {
         getUsr.save()
         render json as JSON
     }
-    
+
     def populateStatus(){
         println params
-        def getUsr = Users.findByUserName(params.loguserName)
+        def getUsr = Users.findByUserName(params.userName)
 
         def blb = getUsr.userPref
-        byte[] bdata = blb.getBytes(1, (int)blb.length()); 
+        byte[] bdata = blb.getBytes(1, (int)blb.length());
         String userPrefs = new String(bdata);
         def json = [status : 1, message : "Retrieving Prefs",userPrefs:userPrefs]
         render json as JSON
