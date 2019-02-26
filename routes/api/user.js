@@ -6,7 +6,6 @@ const User = mongoose.model('User');
 
 //POST new user route (optional, everyone has access)
 router.post('/', auth.optional, (req, res, next) => {
-  console.log(req.body)
   const { body: { user } } = req;
 
   if(!user.email) {
@@ -35,7 +34,6 @@ router.post('/', auth.optional, (req, res, next) => {
 
 //POST login route (optional, everyone has access)
 router.post('/login', auth.optional, (req, res, next) => {
-  console.log(req.body)
   const { body: { user } } = req;
 
   if(!user.email) {
