@@ -1,0 +1,31 @@
+{
+  "name": "wheelchair-apis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "private": "true",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "errorhandler": "^1.5.0",
+    "express": "^4.16.3",
+    "express-jwt": "^5.3.1",
+    "express-session": "^1.15.6",
+    "jsonwebtoken": "^8.2.2",
+    "mongoose": "^5.1.3",
+    "morgan": "^1.9.0",
+    "nodemon": "^1.18.10",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "Taylor Jones",
+  "license": "ISC"
+}
