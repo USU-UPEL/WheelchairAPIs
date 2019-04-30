@@ -16,7 +16,11 @@ const isProduction = process.env.NODE_ENV === 'production';
 const app = express();
 
 //Configure our app
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://localhost'],
+  credentials: true
+}));
+
 app.use(require('morgan')('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -35,6 +39,7 @@ mongoose.set('debug', true);
 require('./models/User');
 require('./config/passport');
 app.use(require('./routes'));
+
 
 //Error handlers & middlewares
 if(!isProduction) {

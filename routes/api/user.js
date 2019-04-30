@@ -11,7 +11,7 @@ router.post('/', auth.optional, (req, res, next) => {
   if(!user.email) {
     return res.status(422).json({
       errors: {
-        email: 'is required',
+        message: 'Email is required',
       },
     });
   }
@@ -19,17 +19,30 @@ router.post('/', auth.optional, (req, res, next) => {
   if(!user.password) {
     return res.status(422).json({
       errors: {
-        password: 'is required',
+        message: 'Password is required',
       },
     });
   }
 
-  const finalUser = new User(user);
+  User.findOne({ 'email': user.email })
+    .exec((err, existing) => {
+      if(!err && existing) {
+        return res.status(422).json({
+          errors: {
+            message: 'User already exists',
+          },
+        });
 
-  finalUser.setPassword(user.password);
+      } else {
+        const finalUser = new User(user);
 
-  return finalUser.save()
-    .then(() => res.json({ user: finalUser.toAuthJSON() }));
+        finalUser.setPassword(user.password);
+
+        return finalUser.save()
+          .then(() => res.json({ user: finalUser.toAuthJSON() }));
+      }
+    })
+
 });
 
 //POST login route (optional, everyone has access)
@@ -39,7 +52,7 @@ router.post('/login', auth.optional, (req, res, next) => {
   if(!user.email) {
     return res.status(422).json({
       errors: {
-        email: 'is required',
+        message: 'Email is required',
       },
     });
   }
@@ -47,15 +60,18 @@ router.post('/login', auth.optional, (req, res, next) => {
   if(!user.password) {
     return res.status(422).json({
       errors: {
-        password: 'is required',
+        message: 'Password is required',
       },
     });
   }
 
   return passport.authenticate('local', { session: false }, (err, passportUser, info) => {
     if(err) {
+      console.log(err)
       return next(err);
     }
+    
+    console.log(err, passportUser, info)
 
     if(passportUser) {
       const user = passportUser;
@@ -64,7 +80,7 @@ router.post('/login', auth.optional, (req, res, next) => {
       return res.json({ user: user.toAuthJSON() });
     }
 
-    return status(400).info;
+    return res.status(400).json(info);
   })(req, res, next);
 });
 
